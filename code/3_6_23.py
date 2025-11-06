@@ -1,8 +1,8 @@
 bl_info = {
     "name": "AnimeLighting",
     "author": "noenii",
-    "version": (1, 0, 0),
-    "blender": (4, 0, 0),
+    "version": (1, 0, 1),
+    "blender": (3, 6, 23),
     "location": "View3D > Sidebar > Shader Panel",
     "description": "Controls the lighting for my Anime Shader.",
     "warning": "",
@@ -29,17 +29,14 @@ class ShaderUpdater(bpy.types.Operator):
                     continue
                 nodes = mat.node_tree.nodes
                 for node in nodes:
-                    if node.type == "GROUP" and node.node_tree and node.node_tree.name == "anime_shader":
-                        try:
-                            mat.node_tree.nodes["Mix"].inputs[7].default_value = (*context.scene.lighting_color, 1.0)
-                            print(f"Successfully updated: {mat.name}")
-                            break
-                        except (AttributeError, KeyError, IndexError, RuntimeError) as e:
-                            print(f"Error in: {mat.name}, {e}")
-                            error = True
-                            
-        if error:
-            self.report({'WARNING'}, f"Errors occurred in some materials (see console).")
+                    if isinstance(node, bpy.types.ShaderNodeGroup):
+                        if node.type == "GROUP" and node.node_tree and node.node_tree.name == "anime_shader":
+                            try:
+                                mat.node_tree.nodes["Mix"].inputs[7].default_value = (*context.scene.lighting_color, 1.0)
+                                print(f"Successfully updated: {mat.name}")
+                                break
+                            except:
+                                pass
         self.report({'INFO'}, "Done! :D")
         return {'FINISHED'}
 
